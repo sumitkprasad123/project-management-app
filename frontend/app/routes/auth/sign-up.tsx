@@ -21,13 +21,14 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useSignUpMutation } from "@/hook/use-auth";
 import { toast } from "sonner";
 
 export type SignUpFormData = z.infer<typeof signUpSchema>;
 
 const signUp = () => {
+  const navigate = useNavigate();
   const form = useForm<SignUpFormData>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
@@ -43,7 +44,12 @@ const signUp = () => {
   const handleOnSubmit = (values: SignUpFormData) => {
     mutate(values, {
       onSuccess: () => {
-        toast.success("Account created successfully! Please sign in.");
+        toast.success("Email verification required.", {
+          description:
+            "Please check your email forva verification link. If you don;t see it, check your spam folder.",
+        });
+        form.reset();
+        navigate("/sign-in");
       },
       onError: (error: any) => {
         const errorMessage =
