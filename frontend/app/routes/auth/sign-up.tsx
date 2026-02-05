@@ -46,7 +46,7 @@ const signUp = () => {
       onSuccess: () => {
         toast.success("Email verification required.", {
           description:
-            "Please check your email forva verification link. If you don;t see it, check your spam folder.",
+            "Please check your email for verification link. If you don;t see it, check your spam folder.",
         });
         form.reset();
         navigate("/sign-in");
