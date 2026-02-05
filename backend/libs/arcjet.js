@@ -4,7 +4,6 @@ import arcjet, {
   tokenBucket,
   validateEmail,
 } from "@arcjet/node";
-import { isSpoofedBot } from "@arcjet/inspect";
 
 const aj = arcjet({
   // Get your site key from https://app.arcjet.com and set it as an environment

@@ -8,20 +8,20 @@ import aj from "../libs/arcjet.js";
 const registerUser = async (req, res) => {
   try {
     const { email, name, password } = req.body;
-    const existingUser = await User.findOne({ email });
 
     const decision = await aj.protect(req, {
       email,
     });
-    console.log("Arcjet decision", decision);
+    // console.log("Arcjet decision", decision);
 
     if (decision.isDenied()) {
       res.writeHead(403, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ message: "Invalid email address." }));
+      return res.end(JSON.stringify({ message: "Invalid email address." }));
     }
 
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      res.status(400).json({
+      return res.status(400).json({
         message: "Email address already in use",
       });
     }
@@ -61,7 +61,7 @@ const registerUser = async (req, res) => {
         .json({ message: "Failed to send verification email" });
     }
 
-    res.status(201).json({
+    return res.status(201).json({
       message:
         "Verification email sent to your email. Please check and verify your account.",
     });
@@ -77,9 +77,7 @@ const loginUser = async (req, res) => {
     const user = await User.findOne({ email }).select("+password");
 
     if (!user) {
-      const existingVerification = await Verification.findOne({
-        userId: user?._id,
-      });
+      res.status(404).json({ message: "User not found." });
     }
 
     if (!user.isEmailVerified) {
@@ -192,4 +190,119 @@ const verifyEmail = async (req, res) => {
   }
 };
 
-export { registerUser, loginUser, verifyEmail };
+const resetPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({
+        message: "User not found.",
+      });
+    }
+
+    if (!user.isEmailVerified) {
+      return res.status(400).json({ message: "Please verify your first." });
+    }
+
+    const existingVerification = await Verification.findOne({
+      userId: user._id,
+    });
+
+    if (existingVerification && existingVerification.expiresAt > new Data()) {
+      return res.status(400).json({
+        message: "Reset password request already sent.",
+      });
+    }
+
+    if (existingVerification && existingVerification.expiresAt < new Date()) {
+      await Verification.findByIdAndDelete(existingVerification._id);
+    }
+
+    const resetPasswordToken = jwt.sign(
+      { userId: user._id, purpose: "reset-password" },
+      process.env.JWT_SECRET,
+      { expireAt: "15m" },
+    );
+
+    await Verification.create({
+      userId: user._id,
+      token: resetPasswordToken,
+      expiresAt: new Date(Date.now() + 15 * 60 * 1000),
+    });
+
+    const resetPasswordLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetPasswordToken}`;
+    const emailBody = `<p>Click <a href="${resetPasswordLink}"> here</a> to reset your password </p>`;
+    const emailSubject = "Reset your password";
+
+    const isEmailSent = await sendEmail(email, emailSubject, emailBody);
+
+    if (!isEmailSent) {
+      return res
+        .status(500)
+        .json({ message: "Send to fail reset password email" });
+    }
+
+    res.status(200).json({ message: "Reset password email sent" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+const verifyResetPasswordTokenAndResetPassword = async (req, res) => {
+  try {
+    const { token, newPassword, confirmPassword } = req.body;
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+
+    if (!payload) {
+      return res.status(401).json({ message: "Unauthorized." });
+    }
+    const { userId, purpose } = payload;
+    if (purpose !== "reset-password") {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const verification = await Verification.findOne({
+      userId,
+      token,
+    });
+    if (!verification) {
+      return res.status(401).json({ message: "Unauthorized." });
+    }
+
+    const isTokenExpired = verification.expireAt < new Date();
+    if (isTokenExpired) {
+      return res.status(401).json({ message: "Token expired" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized." });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "Password do not match" });
+    }
+
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(newPassword, salt);
+
+    user.password = hashPassword;
+    await user.save();
+
+    await Verification.findByIdAndDelete(verification._id);
+    res.status(200).json({ message: "Password reset successfully." });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export {
+  registerUser,
+  loginUser,
+  verifyEmail,
+  resetPassword,
+  verifyResetPasswordTokenAndResetPassword,
+};
