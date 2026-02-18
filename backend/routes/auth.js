@@ -2,6 +2,7 @@ import express from "express";
 import { z } from "zod";
 import { validateRequest } from "zod-express-middleware";
 import {
+  emailSchema,
   loginSchema,
   registerSchema,
   resetPasswordSchema,
@@ -11,7 +12,7 @@ import {
   registerUser,
   loginUser,
   verifyEmail,
-  resetPassword,
+  resetPasswordRequest,
   verifyResetPasswordTokenAndResetPassword,
 } from "../controllers/auth-controller.js";
 
@@ -44,9 +45,9 @@ router.post(
 router.post(
   "/reset-password-request",
   validateRequest({
-    body: { email: z.string().email() },
+    body: emailSchema,
   }),
-  resetPassword,
+  resetPasswordRequest,
 );
 
 router.post(

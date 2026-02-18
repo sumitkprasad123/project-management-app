@@ -190,7 +190,7 @@ const verifyEmail = async (req, res) => {
   }
 };
 
-const resetPassword = async (req, res) => {
+const resetPasswordRequest = async (req, res) => {
   try {
     const { email } = req.body;
 
@@ -209,7 +209,7 @@ const resetPassword = async (req, res) => {
       userId: user._id,
     });
 
-    if (existingVerification && existingVerification.expiresAt > new Data()) {
+    if (existingVerification && existingVerification.expiresAt > new Date()) {
       return res.status(400).json({
         message: "Reset password request already sent.",
       });
@@ -222,7 +222,7 @@ const resetPassword = async (req, res) => {
     const resetPasswordToken = jwt.sign(
       { userId: user._id, purpose: "reset-password" },
       process.env.JWT_SECRET,
-      { expireAt: "15m" },
+      { expiresIn: "15m" },
     );
 
     await Verification.create({
@@ -245,7 +245,7 @@ const resetPassword = async (req, res) => {
 
     res.status(200).json({ message: "Reset password email sent" });
   } catch (error) {
-    console.log(error);
+    console.log("error", error);
     res.status(500).json({ message: "Internal server error." });
   }
 };
@@ -267,11 +267,12 @@ const verifyResetPasswordTokenAndResetPassword = async (req, res) => {
       userId,
       token,
     });
+
     if (!verification) {
       return res.status(401).json({ message: "Unauthorized." });
     }
 
-    const isTokenExpired = verification.expireAt < new Date();
+    const isTokenExpired = verification.expiresAt < new Date();
     if (isTokenExpired) {
       return res.status(401).json({ message: "Token expired" });
     }
@@ -294,7 +295,7 @@ const verifyResetPasswordTokenAndResetPassword = async (req, res) => {
     await Verification.findByIdAndDelete(verification._id);
     res.status(200).json({ message: "Password reset successfully." });
   } catch (error) {
-    console.log(error);
+    console.log("error", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -303,6 +304,6 @@ export {
   registerUser,
   loginUser,
   verifyEmail,
-  resetPassword,
+  resetPasswordRequest,
   verifyResetPasswordTokenAndResetPassword,
 };

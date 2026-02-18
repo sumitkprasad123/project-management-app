@@ -37,7 +37,7 @@ const ForgotPassword = () => {
         setIsSuccess(true);
       },
       onError: (error: any) => {
-        const errorMessage = error.response?.data;
+        const errorMessage = error.response?.data?.message;
         console.log(error);
         toast.error(errorMessage);
       },
@@ -47,73 +47,68 @@ const ForgotPassword = () => {
   return (
     <div className="flex flex-col items-center justify-center h-screen">
       <div className="w-full max-w-md space-y-6">
-        <div className="flex flex-col items-center space-y-6">
-          <div className="flex flex-col items-center justify-center space-y-2">
-            <h1 className="text-2xl font-bold">Forgot Password</h1>
-            <p className="text-muted-foeground">
-              Enter your email to reset your password.
-            </p>
-          </div>
-
-          <Card>
-            <CardHeader>
-              <Link to="/sign-in" className="flex item-center gap-2">
-                <ArrowLeft className="w-4 h-4" />
-                <span>Back to sign in</span>
-              </Link>
-            </CardHeader>
-            <CardContent>
-              {isSuccess ? (
-                <div className="flex flex-col items-center justify-center">
-                  <CheckCircle className="w-10 h-10 text-green-500" />
-                  <h1 className="text-2xl font-bold">
-                    Password reset email sent
-                  </h1>
-                  <p className="text-muted-foreground">
-                    Check your email for a link to reset your password
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <Form {...form}>
-                    <form
-                      onSubmit={form.handleSubmit(onSubmit)}
-                      className="space-y-4"
-                    >
-                      <FormField
-                        name="email"
-                        control={form.control}
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email Address</FormLabel>
-                            <FormControl>
-                              <Input
-                                {...field}
-                                placeholder="Enter your email"
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={isPending}
-                      >
-                        {isPending ? (
-                          <Loader className="w-4 h-4 animate-spin" />
-                        ) : (
-                          "Reset Password"
-                        )}
-                      </Button>
-                    </form>
-                  </Form>
-                </>
-              )}
-            </CardContent>
-          </Card>
+        <div className="flex flex-col items-center justify-center space-y-2">
+          <h1 className="text-2xl font-bold">Forgot Password</h1>
+          <p className="text-muted-foeground">
+            Enter your email to reset your password.
+          </p>
         </div>
+
+        <Card>
+          <CardHeader>
+            <Link to="/sign-in" className="flex item-center gap-2">
+              <ArrowLeft className="w-4 h-4" />
+              <span>Back to sign in</span>
+            </Link>
+          </CardHeader>
+          <CardContent>
+            {isSuccess ? (
+              <div className="flex flex-col items-center justify-center">
+                <CheckCircle className="w-10 h-10 text-green-500" />
+                <h1 className="text-2xl font-bold">
+                  Password reset email sent
+                </h1>
+                <p className="text-muted-foreground">
+                  Check your email for a link to reset your password
+                </p>
+              </div>
+            ) : (
+              <>
+                <Form {...form}>
+                  <form
+                    onSubmit={form.handleSubmit(onSubmit)}
+                    className="space-y-4"
+                  >
+                    <FormField
+                      name="email"
+                      control={form.control}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email Address</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Enter your email" />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                      type="submit"
+                      className="w-full"
+                      disabled={isPending}
+                    >
+                      {isPending ? (
+                        <Loader className="w-4 h-4 animate-spin" />
+                      ) : (
+                        "Reset Password"
+                      )}
+                    </Button>
+                  </form>
+                </Form>
+              </>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
