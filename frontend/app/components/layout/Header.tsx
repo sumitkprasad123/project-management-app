@@ -13,8 +13,8 @@ import {
 } from "../ui/dropdown-menu";
 import { AvatarImage } from "@radix-ui/react-avatar";
 import { Avatar, AvatarFallback } from "../ui/avatar";
-import { Link } from "react-router";
-import { WorkspaceAvatar } from "../workspace/workspace.avatar";
+import { Link, useLoaderData } from "react-router";
+import { WorkspaceAvatar } from "../workspaces/workspace.avatar";
 
 interface HeaderProps {
   onWorkspaceSelected: (workspace: Workspace) => void;
@@ -28,7 +28,7 @@ export const Header = ({
 }: HeaderProps) => {
   const { user, logout } = useAuth();
 
-  const workspaces: any = [];
+  const { workspaces } = useLoaderData() as { workspaces: Workspace[] };
 
   return (
     <div className="bg-background sticky top-0 z-40 border-b">
