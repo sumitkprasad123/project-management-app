@@ -29,6 +29,7 @@ export const Header = ({
   const { user, logout } = useAuth();
 
   const { workspaces } = useLoaderData() as { workspaces: Workspace[] };
+  console.log("workspaces", workspaces);
 
   return (
     <div className="bg-background sticky top-0 z-40 border-b">
