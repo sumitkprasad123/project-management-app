@@ -15,19 +15,23 @@ const verifyEmailSchema = z.object({
   token: z.string().min(1, "Token is required"),
 });
 
+const emailSchema = z.object({
+  email: z.string().email("Invalid email address"),
+});
+
 const resetPasswordSchema = z.object({
   token: z.string().min(1, "Token is requiered"),
   newPassword: z.string().min(8, "Password must be at least 8 charactors long"),
   confirmPassword: z.string().min(8, "Confirm password is required"),
 });
 
-const emailSchema = z.object({
-  email: z.string().email("Invalid email address"),
-});
-
 const inviteMemberSchema = z.object({
   email: z.string().email("Invalid email address"),
   role: z.enum(["admin", "member", "viewer"]),
+});
+
+const tokenSchema = z.object({
+  token: z.string().min(1, "Token is required"),
 });
 
 const workspaceSchema = z.object({
@@ -78,4 +82,5 @@ export {
   projectSchema,
   taskSchema,
   inviteMemberSchema,
+  tokenSchema,
 };

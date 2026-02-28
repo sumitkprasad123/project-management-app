@@ -18,7 +18,7 @@ const userSchema = new Schema(
     profilePicture: { type: String },
     isEmailVerified: { type: Boolean, default: false },
     lastLogin: { type: Date },
-    isFAEnabled: { type: Boolean, default: false },
+    is2FAEnabled: { type: Boolean, default: false },
     twoFAOtp: { type: String, select: false },
     twoFAOtpExpiry: { type: Date, select: false },
   },
