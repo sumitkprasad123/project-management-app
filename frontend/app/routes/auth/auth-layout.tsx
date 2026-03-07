@@ -4,6 +4,7 @@ import { Navigate, Outlet } from "react-router";
 
 const AuthLayout = () => {
   const { isAuthenticated, isLoading } = useAuth();
+  console.log("isAuthenticated", isAuthenticated);
   if (isLoading) {
     return <div>Loading...</div>;
   }
