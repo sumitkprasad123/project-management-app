@@ -22,6 +22,13 @@ export const useGetWorkspaceQuery = (workspaceId: string) => {
   });
 };
 
+export const useGetWorkspaceStatsQuery = (workspaceId: string) => {
+  return useQuery({
+    queryKey: ["workspace", workspaceId, "stats"],
+    queryFn: async () => fetchData(`/workspaces/${workspaceId}/stats`),
+  });
+};
+
 export const useInviteMemberMutation = () => {
   return useMutation({
     mutationFn: (data: { email: string; role: string; workspaceId: string }) =>
