@@ -4,11 +4,13 @@ import authRoutes from "./auth.js";
 import workspaceRoutes from "./workspace.js";
 import projectRoutes from "./project.js";
 import tasksRoutes from "./task.js";
+import usersRoutes from "./user.js";
 
 const router = express.Router();
 router.use("/auth", authRoutes);
 router.use("/workspaces", workspaceRoutes);
 router.use("/projects", projectRoutes);
 router.use("/tasks", tasksRoutes);
+router.use("/users", usersRoutes);
 
 export default router;
