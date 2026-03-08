@@ -14,11 +14,7 @@ export interface Workspace {
   description?: string;
   owner: User | string;
   color: string;
-  members: {
-    user: User | string;
-    role: "admin" | "member" | "owner" | "viewer";
-    joineAt: Date;
-  }[];
+  members: MemberProps[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -41,10 +37,7 @@ export interface Project {
   dueDate: Date;
   progress: number;
   tasks: Task[];
-  members: {
-    user: User;
-    role: "admin" | "member" | "owner" | "viewer";
-  }[];
+  members: MemberProps[];
   createdAt: Date;
   updatedAt: Date;
   isArchived: boolean;
